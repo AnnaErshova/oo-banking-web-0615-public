@@ -12,36 +12,33 @@ class Transfer
   end
 
   def both_valid?
-    sender.valid? && receiver.valid?
+    sender.valid? && receiver.valid? && @status == "pending" && @sender.balance >= @amount
     # these seem like they need @, but RegEx doesn't work then
   end
 
   def execute_transaction
-    if both_valid? && self.status == "pending" # if both transactions can go through
-      if @sender.balance >= @amount # if sender is liquid
-        @receiver.balance = @receiver.balance + self.amount
-        @sender.balance = @sender.balance - self.amount
-        self.status = "complete"
-      else 
-        rejected_status
-      end
-    else
-      rejected_status
-    end
-  end
-
-  def rejected_status
-    self.status = "rejected"
-    "Transaction rejected. Please check your account balance."
+    both_valid? ? transaction_approved : transaction_rejected
   end
 
   def reverse_transfer
-    unless @status != "complete" #it can only reverse executed transfers
-      @receiver.balance = @receiver.balance - @amount
-      @sender.balance = @sender.balance + @amount
-      #binding.pry
+    transaction_reversed if @status == "complete"
+  end
+
+  def transaction_rejected
+    @status = "rejected"
+    "Transaction rejected. Please check your account balance."
+  end
+
+  def transaction_approved
+      @receiver.balance += @amount
+      @sender.balance -= @amount
+      @status = "complete"
+  end
+
+  def transaction_reversed
+      @receiver.balance -= @amount
+      @sender.balance += @amount
       @status = "reversed"
-    end
   end
 
 end # end class

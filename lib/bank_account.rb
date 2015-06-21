@@ -14,7 +14,7 @@ class BankAccount
   end
 
   def display_balance
-    "Your Balance is $#{balance}."
+    "Your Balance is $#{@balance}."
   end
 
   # BankAccount is valid with an open status and a balance greater than 0
@@ -23,7 +23,7 @@ class BankAccount
   end
 
   def close_account
-    self.status = "closed"
+    @status = "closed"
   end
 
 end # end BankAccount class
